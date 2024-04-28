@@ -3,9 +3,13 @@
 We introduced a Simulated Two Stream Network (STS-Net), utilizing a more efficient knowledge distillation approach to acquire motion representations. 
 First, we try to distill knowledge of optical flow across various levels through a review mechanism, thereby capturing both low-level feature and high-level semantic information.
 Second, we apply a decoupled knowledge distillation loss to obtain a more comprehensive knowledge transfer. 
-Additionally, we analyzed the role of the activation function in fusing the two streams, and proposed an effective fusion strategy named ``ActivNo".
-The experimental results on benchmark datasets (\emph{i.e.}, HMDB51, UCF101, and Kinetics400) demonstrated that the proposed STS-Net achieves superior performance, surpassing comparable methods in terms of efficiency and accuracy.
+Additionally, we analyzed the role of the activation function in fusing the two streams, and proposed an effective fusion strategy named "ActivNo".
+The experimental results on benchmark datasets (i.e., HMDB51, UCF101, and Kinetics400) demonstrated that the proposed STS-Net achieves superior performance, surpassing comparable methods in terms of efficiency and accuracy.
 
+<div align="center">
+  <img src="https://github.com/BiBiKo219/STS-Net/blob/main/utils1/intro.jpg" width="580px"/><br>
+    <p style="font-size:1.5vw;">Flowchart of STS-Net.</p>
+</div>
 
 ## Contents
 1. [Requirements](#requirements)
@@ -70,7 +74,7 @@ python utils1/extract_frames.py path_to_video_files path_to_extracted_frames sta
     
     python utils1/extract_frames_flows.py path_to_video_files path_to_extracted_flows_frames start_class end_class gpu_id
     ```
-## Models
+<!-- ## Models
 
 Trained models can be found [here](https://drive.google.com/drive/folders/1OVhBnZ_FmqMSj6gw9yyrxJJR8yRINb_G?usp=sharing). The names of the models are in the form of 
 
@@ -80,7 +84,7 @@ stream_dataset_frames.pth
 RGB_Kinetics_16f.pth indicates --modality RGB --dataset Kinetics --sample_duration 16
 ```
 
-For HMDB51 and UCF101, we have only provided trained models for the first split.
+For HMDB51 and UCF101, we have only provided trained models for the first split. -->
 
 ## Testing script
 For RGB stream:
