@@ -54,23 +54,23 @@ if __name__=="__main__":
 
     if opt.log == 1:
         if opt.pretrain_path != '':
-            epoch_logger = Logger_MARS(os.path.join(log_path, 'PreKin_MARS_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
+            epoch_logger = Logger_SFS(os.path.join(log_path, 'PreKin_SFS_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
                 .format(opt.dataset, opt.split, opt.batch_size, opt.sample_size, opt.sample_duration, opt.learning_rate, opt.nesterov, opt.manual_seed, opt.model, opt.model_depth, opt.ft_begin_index,
-                                opt.output_layers[0], opt.MARS_alpha))
-                            ,['epoch', 'loss', 'loss_MSE', 'loss_MARS', 'acc', 'lr'], opt.MARS_resume_path, opt.begin_epoch)
-            val_logger   = Logger_MARS(os.path.join(log_path, 'PreKin_MARS_{}_{}_val_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
+                                opt.output_layers[0], opt.SFS_alpha))
+                            ,['epoch', 'loss', 'loss_MSE', 'loss_SFS', 'acc', 'lr'], opt.SFS_resume_path, opt.begin_epoch)
+            val_logger   = Logger_SFS(os.path.join(log_path, 'PreKin_SFS_{}_{}_val_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
                             .format(opt.dataset,opt.split,  opt.batch_size, opt.sample_size, opt.sample_duration, opt.learning_rate, opt.nesterov, opt.manual_seed, opt.model, opt.model_depth, opt.ft_begin_index,
-                                opt.output_layers[0], opt.MARS_alpha))
-                            ,['epoch', 'loss', 'acc'], opt.MARS_resume_path, opt.begin_epoch)
+                                opt.output_layers[0], opt.SFS_alpha))
+                            ,['epoch', 'loss', 'acc'], opt.SFS_resume_path, opt.begin_epoch)
         else:
-            epoch_logger = Logger_MARS(os.path.join(log_path, 'MARS_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
+            epoch_logger = Logger_SFS(os.path.join(log_path, 'SFS_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
                             .format(opt.dataset, opt.split, opt.batch_size, opt.sample_size, opt.sample_duration, opt.learning_rate, opt.nesterov, opt.manual_seed, opt.model, opt.model_depth, opt.ft_begin_index,
-                                opt.output_layers[0], opt.MARS_alpha))
-                            ,['epoch', 'loss', 'loss_MSE', 'loss_MARS', 'acc', 'lr'], opt.MARS_resume_path, opt.begin_epoch)
-            val_logger   = Logger_MARS(os.path.join(log_path, 'MARS_{}_{}_val_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
+                                opt.output_layers[0], opt.SFS_alpha))
+                            ,['epoch', 'loss', 'loss_MSE', 'loss_SFS', 'acc', 'lr'], opt.SFS_resume_path, opt.begin_epoch)
+            val_logger   = Logger_SFS(os.path.join(log_path, 'SFS_{}_{}_val_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}.log'
                             .format(opt.dataset, opt.split, opt.batch_size, opt.sample_size, opt.sample_duration, opt.learning_rate, opt.nesterov, opt.manual_seed, opt.model, opt.model_depth, opt.ft_begin_index,
-                                opt.output_layers[0], opt.MARS_alpha))
-                            ,['epoch', 'loss', 'acc'], opt.MARS_resume_path, opt.begin_epoch)
+                                opt.output_layers[0], opt.SFS_alpha))
+                            ,['epoch', 'loss', 'acc'], opt.SFS_resume_path, opt.begin_epoch)
 
     if opt.pretrain_path!='' and opt.dataset!= 'Kinetics': 
         opt.weight_decay = 1e-5
@@ -81,9 +81,9 @@ if __name__=="__main__":
 
        
     # define the model 
-    print("Loading MARS model... ", opt.model, opt.model_depth)
+    print("Loading SFS model... ", opt.model, opt.model_depth)
     opt.input_channels =3
-    model_MARS, parameters_MARS = generate_model(opt)
+    model_SFS, parameters_SFS = generate_model(opt)
 
     print("Loading Flow model... ", opt.model, opt.model_depth) 
     opt.input_channels =2 
@@ -98,7 +98,7 @@ if __name__=="__main__":
 
     model_Flow, parameters_Flow = generate_model(opt)
     
-    criterion_MARS  = nn.CrossEntropyLoss().cuda()
+    criterion_SFS  = nn.CrossEntropyLoss().cuda()
     criterion_Flow = nn.MSELoss().cuda()
     
     if opt.resume_path1:
@@ -107,13 +107,13 @@ if __name__=="__main__":
         model_Flow.load_state_dict(checkpoint['state_dict'])
            
         
-    if opt.MARS_resume_path:
-        print('loading MARS checkpoint {}'.format(opt.MARS_resume_path))
-        checkpoint = torch.load(opt.MARS_resume_path)
+    if opt.SFS_resume_path:
+        print('loading SFS checkpoint {}'.format(opt.SFS_resume_path))
+        checkpoint = torch.load(opt.SFS_resume_path)
         assert opt.arch == checkpoint['arch']
 
         opt.begin_epoch = checkpoint['epoch']
-        model_MARS.load_state_dict(checkpoint['state_dict'])
+        model_SFS.load_state_dict(checkpoint['state_dict'])
 
     
     print("Initializing the optimizer ...")
@@ -123,7 +123,7 @@ if __name__=="__main__":
     print("LR patience = ", opt.lr_patience) 
 
     optimizer = optim.SGD(
-        parameters_MARS,
+        parameters_SFS,
         lr=opt.learning_rate,
         momentum=opt.momentum,
         dampening=dampening,
@@ -131,45 +131,45 @@ if __name__=="__main__":
         nesterov=opt.nesterov)
     scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=opt.lr_patience)
     
-    if opt.MARS_resume_path != '':
+    if opt.SFS_resume_path != '':
         print("Loading optimizer checkpoint state")
-        optimizer.load_state_dict(torch.load(opt.MARS_resume_path)['optimizer'])
+        optimizer.load_state_dict(torch.load(opt.SFS_resume_path)['optimizer'])
     
    
     model_Flow.eval()
     print('run')
     for epoch in range(opt.begin_epoch, opt.n_epochs + 1):
         
-        model_MARS.train()
+        model_SFS.train()
         batch_time = AverageMeter()
         data_time  = AverageMeter()
         losses     = AverageMeter()
-        losses_MARS = AverageMeter()
+        losses_SFS = AverageMeter()
         losses_MSE = AverageMeter()
         accuracies = AverageMeter()
 
         end_time = time.time()
         for i, (inputs, targets) in enumerate(train_dataloader):
             data_time.update(time.time() - end_time)
-            inputs_MARS  = inputs[:,0:3,:,:,:]
+            inputs_SFS  = inputs[:,0:3,:,:,:]
             inputs_Flow = inputs[:,3:,:,:,:]
             
             targets = targets.cuda(non_blocking=True)
             # pdb.set_trace()
-            inputs_MARS  = Variable(inputs_MARS)
+            inputs_SFS  = Variable(inputs_SFS)
             inputs_Flow = Variable(inputs_Flow)
             targets     = Variable(targets)
             
-            outputs_MARS  = model_MARS(inputs_MARS)
+            outputs_SFS  = model_SFS(inputs_SFS)
             outputs_Flow = model_Flow(inputs_Flow)[1].detach()
            
-            loss_MARS = criterion_MARS(outputs_MARS[0], targets)
-            loss_MSE = opt.MARS_alpha*criterion_Flow(outputs_MARS[1], outputs_Flow)
-            loss     = loss_MARS + loss_MSE
-            acc = calculate_accuracy(outputs_MARS[0], targets)
+            loss_SFS = criterion_SFS(outputs_SFS[0], targets)
+            loss_MSE = opt.SFS_alpha*criterion_Flow(outputs_SFS[1], outputs_Flow)
+            loss     = loss_SFS + loss_MSE
+            acc = calculate_accuracy(outputs_SFS[0], targets)
 
             losses.update(loss.data, inputs.size(0))
-            losses_MARS.update(loss_MARS.data, inputs.size(0))
+            losses_SFS.update(loss_SFS.data, inputs.size(0))
             losses_MSE.update(loss_MSE.data, inputs.size(0))
             accuracies.update(acc, inputs.size(0))
 
@@ -184,7 +184,7 @@ if __name__=="__main__":
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Loss_MARS {loss_MARS.val:.4f} ({loss_MARS.avg:.4f})\t'
+                  'Loss_SFS {loss_SFS.val:.4f} ({loss_SFS.avg:.4f})\t'
                   'Loss_MSE {loss_MSE.val:.4f} ({loss_MSE.avg:.4f})\t'
                   'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
                       epoch,
@@ -193,7 +193,7 @@ if __name__=="__main__":
                       batch_time=batch_time,
                       data_time=data_time,
                       loss=losses,
-                      loss_MARS=losses_MARS,
+                      loss_SFS=losses_SFS,
                       loss_MSE=losses_MSE,
                       acc=accuracies))
                       
@@ -202,29 +202,29 @@ if __name__=="__main__":
                 'epoch': epoch,
                 'loss': losses.avg,
                 'loss_MSE' : losses_MSE.avg,
-                'loss_MARS': losses_MARS.avg,
+                'loss_SFS': losses_SFS.avg,
                 'acc': accuracies.avg,
                 'lr': optimizer.param_groups[0]['lr']
             })
         
         if epoch % opt.checkpoint == 0:
             if opt.pretrain_path != '':
-                save_file_path = os.path.join(log_path, 'MARS_preKin_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}_{}.pth'
+                save_file_path = os.path.join(log_path, 'SFS_preKin_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}_{}.pth'
                             .format(opt.dataset, opt.split, opt.batch_size, opt.sample_size, opt.sample_duration, opt.learning_rate, opt.nesterov, opt.manual_seed, opt.model, opt.model_depth, opt.ft_begin_index, 
-                                opt.output_layers[0], opt.MARS_alpha, epoch))
+                                opt.output_layers[0], opt.SFS_alpha, epoch))
             else:
-                save_file_path = os.path.join(log_path, 'MARS_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}_{}.pth'
+                save_file_path = os.path.join(log_path, 'SFS_{}_{}_train_batch{}_sample{}_clip{}_lr{}_nesterov{}_manualseed{}_model{}{}_ftbeginidx{}_layer{}_alpha{}_{}.pth'
                             .format(opt.dataset, opt.split, opt.batch_size, opt.sample_size, opt.sample_duration, opt.learning_rate, opt.nesterov, opt.manual_seed, opt.model, opt.model_depth, opt.ft_begin_index, 
-                                opt.output_layers[0], opt.MARS_alpha, epoch))
+                                opt.output_layers[0], opt.SFS_alpha, epoch))
             states = {
                 'epoch': epoch + 1,
                 'arch': opt.arch,
-                'state_dict': model_MARS.state_dict(),
+                'state_dict': model_SFS.state_dict(),
                 'optimizer': optimizer.state_dict(),
             }
             torch.save(states, save_file_path)
         
-        model_MARS.eval()
+        model_SFS.eval()
 
         batch_time = AverageMeter()
         data_time = AverageMeter()
@@ -236,16 +236,16 @@ if __name__=="__main__":
             for i, (inputs, targets) in enumerate(val_dataloader):
                 
                 data_time.update(time.time() - end_time)
-                inputs_MARS  = inputs[:,0:3,:,:,:]
+                inputs_SFS  = inputs[:,0:3,:,:,:]
                 
                 targets = targets.cuda(non_blocking=True)
-                inputs_MARS  = Variable(inputs_MARS)
+                inputs_SFS  = Variable(inputs_SFS)
                 targets     = Variable(targets)
                 
-                outputs_MARS  = model_MARS(inputs_MARS)
+                outputs_SFS  = model_SFS(inputs_SFS)
                 
-                loss = criterion_MARS(outputs_MARS[0], targets)
-                acc  = calculate_accuracy(outputs_MARS[0], targets)
+                loss = criterion_SFS(outputs_SFS[0], targets)
+                acc  = calculate_accuracy(outputs_SFS[0], targets)
 
                 losses.update(loss.data, inputs.size(0))
                 accuracies.update(acc, inputs.size(0))

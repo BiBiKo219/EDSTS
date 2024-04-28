@@ -151,7 +151,7 @@ def parse_opts():
         type=int,
         help='Patience of LR scheduler. See documentation of ReduceLROnPlateau.')
     parser.add_argument(
-        '--MARS_alpha', 
+        '--SFS_alpha', 
         default=50, 
         type=float, 
         help='Weight of Flow augemented MSE loss')
@@ -173,25 +173,25 @@ def parse_opts():
         type=str,
         help='result_path')
     parser.add_argument(
-        '--MARS', 
+        '--SFS', 
         action='store_true', 
-        help='test MARS')
-    parser.set_defaults(MARS=False)    
+        help='test SFS')
+    parser.set_defaults(SFS=False)    
     parser.add_argument(
         '--pretrain_path', 
         default='', 
         type=str, 
         help='Pretrained model (.pth)')
     parser.add_argument(
-        '--MARS_pretrain_path', 
+        '--SFS_pretrain_path', 
         default='', 
         type=str, 
         help='Pretrained model (.pth)')
     parser.add_argument(
-        '--MARS_resume_path', 
+        '--SFS_resume_path', 
         default='', 
         type=str, 
-        help='MARS resume model (.pth)')
+        help='SFS resume model (.pth)')
     parser.add_argument(
         '--resume_path1',
         default='',

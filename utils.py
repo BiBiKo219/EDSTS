@@ -61,7 +61,7 @@ class Logger(object):
         self.logger.writerow(write_values)
         self.log_file.flush()
 
-class Logger_MARS(object):
+class Logger_SFS(object):
 
     def __init__(self, path, header, resume_path, begin_epoch):
         if resume_path == '':
