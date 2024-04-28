@@ -1,59 +1,11 @@
-# MARS: Motion-Augmented RGB Stream for Action Recognition
+# Simulated Two-Stream Network with Efficient Distillation for Action Recognition
 
-By Nieves Crasto, Philippe Weinzaepfel, Karteek Alahari and Cordelia Schmid
+We introduced a Simulated Two Stream Network (STS-Net), utilizing a more efficient knowledge distillation approach to acquire motion representations. 
+First, we try to distill knowledge of optical flow across various levels through a review mechanism, thereby capturing both low-level feature and high-level semantic information.
+Second, we apply a decoupled knowledge distillation loss to obtain a more comprehensive knowledge transfer. 
+Additionally, we analyzed the role of the activation function in fusing the two streams, and proposed an effective fusion strategy named ``ActivNo".
+The experimental results on benchmark datasets (\emph{i.e.}, HMDB51, UCF101, and Kinetics400) demonstrated that the proposed STS-Net achieves superior performance, surpassing comparable methods in terms of efficiency and accuracy.
 
-MARS is a strategy to learn a stream that takes only RGB frames as input
-but leverages both appearance and motion information from them. This is
-achieved by training a network to minimize the loss between its features and
-the Flow stream, along with the cross entropy loss for recognition.
-For more details, please refer to our [CVPR 2019 paper](https://hal.inria.fr/hal-02140558/document) and our [website](https://europe.naverlabs.com/Research/Computer-Vision/Video-Analysis/MARS).
-
-We release the testing code along trained models. 
-
-<!-- #### Performance on Kinetics400
-
-|Method 												| Stream   | Pretrain | Acc   |
-|-------------------------------------------------------|:--------:|:--------:|:-----:|
-|[I3D](https://arxiv.org/pdf/1705.07750.pdf)			| RGB      |ImageNet  | 71.1  |
-|[ResNext101](https://arxiv.org/pdf/1711.09577.pdf)	    | RGB      |none      | 65.1  |
-|[R(2+1)D](https://arxiv.org/pdf/1711.11248.pdf)	    | RGB      |Sport-1M  | 74.3  |
-|[S3D-G](https://arxiv.org/pdf/1712.04851.pdf)		    | RGB      |ImageNet  | 74.7  | 
-|[NL-I3D](https://arxiv.org/pdf/1711.07971.pdf)		    | RGB      |ImageNet  |**77.7**|
-|**MARS**                   							| RGB      | none     |  72.7 |
-|**MARS+RGB**               							| RGB      | none     |  74.8 |
-|[I3D](https://arxiv.org/pdf/1705.07750.pdf)			| RGB+Flow | ImageNet |  74.2 | 
-|[R(2+1)D](https://arxiv.org/pdf/1711.11248.pdf)		| RGB+Flow | Sports-1M| 75.4  |
-|[S3D-G](https://arxiv.org/pdf/1712.04851.pdf)		    | RGB+Flow | ImageNet | 77.2  |
-|**MARS+RGB+Flow**		          					    | RGB+Flow |  none    | 74.9  | -->
-
-<!-- #### Performance om HMDB51, UCF101 and SomethingSomethingv1
-
-|Method 				| Streams | Pretrain | UCF101 | HMDB51 | Something Somethingv1|
-|-----------------------|:-------:|:--------:|:------:|:------:|:--------------------:|
-[TRN](https://arxiv.org/pdf/1711.08496.pdf)                 |RGB      |none      | ---    | ---    | 34.4                 |
-[MFNet](https://arxiv.org/pdf/1807.10037.pdf)   			|RGB      |none      | ---    | ---    | 43.9       |
-[I3D](https://arxiv.org/pdf/1705.07750.pdf)					|RGB      |ImNet+Kin | 95.6   | 74.8   | ---        |
-[ResNext101](https://arxiv.org/pdf/1711.09577.pdf)			|RGB      |Kinetics  | 94.5   | 70.1   | ---    	|
-[S3D-G](https://arxiv.org/pdf/1712.04851.pdf)         		|RGB      |ImNet+Kin | 96.8   | 75.9   | 48.2		|
-[R(2+1)D](https://arxiv.org/pdf/1711.11248.pdf)       		|RGB      |Kinetics  | 96.8   | 74.5   | ---        |
-**MARS**                      								|RGB      |Kinetics  | 97.4   | 79.3   | 48.7		|
-**MARS+RGB**                  								|RGB      |Kinetics  |**97.6**|**79.5**|**51.7**	|
-[2-stream](https://arxiv.org/pdf/1406.2199.pdf)				|RGB+Flow |ImageNet  | 88.0   | 59.4   | --- 		|
-[TRN](https://arxiv.org/pdf/1711.08496.pdf)					|RGB+Flow |none      | ---    | ---    | 42.0		|
-[I3D](https://arxiv.org/pdf/1705.07750.pdf)             	|RGB+Flow |ImNet+Kin |**98.0**|**80.7**| ---		|
-[R(2+1)D](https://arxiv.org/pdf/1711.11248.pdf)				|RGB+Flow |Kinetics  |  97.3  | 78.7   | --- 		|
-[OFF](https://arxiv.org/pdf/1711.11152.pdf)					|RGB+Flow |none      | 96.0   | 74.2   | --- 		|
-**MARS+RGB+Flow**            								|RGB+Flow |Kinetics  |**98.1**|**80.9**|**53.0**	| -->
-
-## Citing MARS
-```
-@inproceedings{crasto2019mars,
-  title={{MARS: Motion-Augmented RGB Stream for Action Recognition}},
-  author={Crasto, Nieves and Weinzaepfel, Philippe and Alahari, Karteek and Schmid, Cordelia},
-  booktitle={CVPR},
-  year={2019}
-}
-```
 
 ## Contents
 1. [Requirements](#requirements)
@@ -62,14 +14,19 @@ We release the testing code along trained models.
 4. [Testing](#testing)
 
 ## Requirements
-* Python3
-* [Pytorch 1.0](https://pytorch.org/get-started/locally/)
-```
-conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
-```
-* ffmpeg version 3.2.4
-* OpenCV with GPU support (will not be providing support in compiling this part)
 
+Environments:
+
+- Python 3.6
+- PyTorch 1.9.0
+- torchvision 0.10.0
+
+Install the package:
+
+```
+sudo pip3 install -r requirements.txt
+sudo python3 setup.py develop
+```
 
 
 * Directory tree
@@ -146,23 +103,23 @@ python test_single_stream.py --batch_size 1 --n_classes 51 --model resnext --mod
 --result_path "results/"
 ```
 
-For single stream MARS: 
+For single stream SFS: 
 
 ```
 python test_single_stream.py --batch_size 1 --n_classes 51 --model resnext --model_depth 101 \
 --log 0 --dataset HMDB51 --modality RGB --sample_duration 16 --split 1 --only_RGB  \
---resume_path1 "trained_models/HMDB51/MARS_HMDB51_16f.pth" \
+--resume_path1 "trained_models/HMDB51/SFS_HMDB51_16f.pth" \
 --frame_dir "dataset/HMDB51" \
 --annotation_path "dataset/HMDB51_labels" \
 --result_path "results/"
 ```
 
-For two streams RGB+MARS:
+For two streams RGB+SFS (STS-Net):
 ```
 python test_two_stream.py --batch_size 1 --n_classes 51 --model resnext --model_depth 101 \
 --log 0 --dataset HMDB51 --modality RGB --sample_duration 16 --split 1 --only_RGB  \
 --resume_path1 "trained_models/HMDB51/RGB_HMDB51_16f.pth" \
---resume_path2 "trained_models/HMDB51/MARS_HMDB51_16f.pth" \
+--resume_path2 "trained_models/HMDB51/SFS_HMDB51_16f.pth" \
 --frame_dir "dataset/HMDB51" \
 --annotation_path "dataset/HMDB51_labels" \
 --result_path "results/"
@@ -254,14 +211,14 @@ python test_two_stream.py --batch_size 1 --n_classes 51 --model resnext --model_
 --result_path "results/"
 ```
 
-### For MARS:
+### For SFS:
 #### From scratch:  
 ```
-python MARS_train.py --dataset Kinetics --modality RGB_Flow \
+python STS_train.py --dataset Kinetics --modality RGB_Flow \
 --n_classes 400 \
 --batch_size 16 --log 1 --sample_duration 16 \
 --model resnext --model_depth 101 \
---output_layers 'avgpool' --MARS_alpha 50 \
+--output_layers 'avgpool' --SFS_alpha 50 \
 --frame_dir "dataset/Kinetics" \
 --annotation_path "dataset/Kinetics_labels" \
 --resume_path1 "trained_models/Kinetics/Flow_Kinetics_16f.pth" \
@@ -270,70 +227,28 @@ python MARS_train.py --dataset Kinetics --modality RGB_Flow \
 
 #### From pretrained Kinetics400:
 ```
-python MARS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
+python STS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
 --n_classes 400 --n_finetune_classes 51 \
 --batch_size 16 --log 1 --sample_duration 16 \
 --model resnext --model_depth 101 --ft_begin_index 4 \
---output_layers 'avgpool' --MARS_alpha 50 \
+--output_layers 'avgpool' --SFS_alpha 50 \
 --frame_dir "dataset/HMDB51" \
 --annotation_path "dataset/HMDB51_labels" \
---pretrain_path "trained_models/Kinetics/MARS_Kinetics_16f.pth" \
+--pretrain_path "trained_models/Kinetics/SFS_Kinetics_16f.pth" \
 --resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
 --result_path "results/" --checkpoint 1
 ```
 #### From checkpoint:
 ```
-python MARS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
+python STS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
 --n_classes 400 --n_finetune_classes 51 \
 --batch_size 16 --log 1 --sample_duration 16 \
 --model resnext --model_depth 101 --ft_begin_index 4 \
---output_layers 'avgpool' --MARS_alpha 50 \
+--output_layers 'avgpool' --SFS_alpha 50 \
 --frame_dir "dataset/HMDB51" \
 --annotation_path "dataset/HMDB51_labels" \
---pretrain_path "trained_models/Kinetics/MARS_Kinetics_16f.pth" \
+--pretrain_path "trained_models/Kinetics/SFS_Kinetics_16f.pth" \
 --resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
---MARS_resume_path "results/HMDB51/MARS_HMDB51_1_train_batch16_sample112_clip16_lr0.001_nesterovFalse_manualseed1_modelresnext101_ftbeginidx4_layeravgpool_alpha50.0_1.pth" \
---result_path "results/" --checkpoint 1
-```
-
-### For MERS:
-#### From scratch:  
-```
-python MERS_train.py --dataset Kinetics --modality RGB_Flow \
---n_classes 400 \
---batch_size 16 --log 1 --sample_duration 16 \
---model resnext --model_depth 101 \
---output_layers 'avgpool' --MARS_alpha 50 \
---frame_dir "dataset/Kinetics" \
---annotation_path "dataset/Kinetics_labels" \
---resume_path1 "trained_models/Kinetics/Flow_Kinetics_16f.pth" \
---result_path "results/" --checkpoint 1
-```
-
-#### From pretrained Kinetics400:
-```
-python MERS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
---n_classes 400 --n_finetune_classes 51 \
---batch_size 16 --log 1 --sample_duration 16 \
---model resnext --model_depth 101 --ft_begin_index 4 \
---output_layers 'avgpool' --MARS_alpha 50 \
---frame_dir "dataset/HMDB51" \
---annotation_path "dataset/HMDB51_labels" \
---pretrain_path "trained_models/Kinetics/MERS_Kinetics_16f.pth" \
---resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
---result_path "results/" --checkpoint 1
-```
-#### From checkpoint:
-```
-python MERS_train.py --dataset HMDB51 --modality RGB_Flow --split 1  \
---n_classes 400 --n_finetune_classes 51 \
---batch_size 16 --log 1 --sample_duration 16 \
---model resnext --model_depth 101 --ft_begin_index 4 \
---output_layers 'avgpool' --MARS_alpha 50 \
---frame_dir "dataset/HMDB51" \
---annotation_path "dataset/HMDB51_labels" \
---pretrain_path "trained_models/Kinetics/MARS_Kinetics_16f.pth" \
---resume_path1 "trained_models/HMDB51/Flow_HMDB51_16f.pth" \
---MARS_resume_path "results/HMDB51/MERS_HMDB51_1_train_batch16_sample112_clip16_lr0.001_nesterovFalse_manualseed1_modelresnext101_ftbeginidx4_layeravgpool_alpha50.0_1.pth" \
+--SFS_resume_path "results/HMDB51/SFS_HMDB51_1_train_batch16_sample112_clip16_lr0.001_nesterovFalse_manualseed1_modelresnext101_ftbeginidx4_layeravgpool_alpha50.0_1.pth" \
 --result_path "results/" --checkpoint 1
 ```
